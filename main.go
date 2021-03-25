@@ -14,15 +14,9 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	const templ = `Interfaces : {{ . | len }} 
-#################
-{{range $i, $d := .}}
-[ {{$i}} ] - {{.Name}}{{range .Addresses}}
-  IP :      {{.IP}}
-  Netmask : {{.Netmask}}
-  ------------------------------------------------------------{{end}}
-{{end}}
-`
+	const templ = `index;interface;IP;mask
+{{range $i, $d := .}}{{$name := .Name}}{{range .Addresses}}{{$i}};{{$name}};{{.IP}};{{.Netmask}}
+{{else}}{{$i}};{{$name}};;{{end}}{{end}}`
 
 	report := template.Must(template.New("templ").Parse(templ))
 
