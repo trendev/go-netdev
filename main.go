@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"log"
+	"os"
 
 	"github.com/google/gopacket/pcap"
 )
@@ -13,11 +14,19 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fmt.Println(len(ds), "interface(s):")
+	const templ = `Interfaces : {{ . | len }} 
+#################
+{{range $i, $d := .}}
+[ {{$i}} ] - {{.Name}}{{range .Addresses}}
+  IP :      {{.IP}}
+  Netmask : {{.Netmask}}
+  ------------------------------------------------------------{{end}}
+{{end}}
+`
 
-	for _, d := range ds {
-		for _, a := range d.Addresses {
-			fmt.Printf("interface = %s ; IP = %s ; mask = %s\n", d.Name, a.IP, a.Netmask)
-		}
+	report := template.Must(template.New("templ").Parse(templ))
+
+	if err := report.Execute(os.Stdout, ds); err != nil {
+		log.Fatalln(err)
 	}
 }
