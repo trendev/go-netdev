@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -10,6 +11,10 @@ import (
 )
 
 func main() {
+
+	path := flag.String("f", "ifdevs.csv", "file path")
+	flag.Parse()
+
 	fmt.Println(" 🔍 Collecting devices details...")
 
 	ds, err := pcap.FindAllDevs()
@@ -24,9 +29,7 @@ func main() {
 
 	report := template.Must(template.New("templ").Parse(templ))
 
-	path := "ifdevs.csv"
-
-	f, err := os.Create(path)
+	f, err := os.Create(*path)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -38,5 +41,5 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fmt.Printf(" 👍 Interfaces saved in file %q\n", path)
+	fmt.Printf(" 👍 Interfaces saved in file %q\n", *path)
 }
